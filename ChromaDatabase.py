@@ -1,18 +1,15 @@
 # imports
 from langchain_community.document_loaders import DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.schema import Document
-from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
-import openai 
 from dotenv import load_dotenv
 import os
 import shutil
 
 # Load environment variables. Assumes that project contains .env file with API keys
 load_dotenv()
-# Set OpenAI API key
-openai.api_key = os.environ["OPENAI_API_KEY"]
 
 CHROMA_PATH = "chroma"
 DATA_PATH = "data/books"
@@ -57,8 +54,9 @@ def save_to_chroma(chunks: list[Document]):
         shutil.rmtree(CHROMA_PATH)
 
     # Create a new DB from the documents.
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     db = Chroma.from_documents(
-        chunks, OpenAIEmbeddings(), persist_directory=CHROMA_PATH
+        chunks, embeddings, persist_directory=CHROMA_PATH
     )
     db.persist()
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
