@@ -9,9 +9,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 
 CHROMA_PATH = "chroma"
-QUERY_TEXT = "What is Alice doing at the start?"
+QUERY_TEXT = "How does the Cat vanish this time?"
 K = 5
-MIN_SCORE = 0.0
 GEMINI_MODEL = "gemini-2.5-flash-lite"
 
 PROMPT_TEMPLATE = """
@@ -48,10 +47,6 @@ def main():
 
     for i, (_doc, score) in enumerate(results, start=1):
         print(f"Result {i} relevance score: {score:.4f}")
-
-    if results[0][1] < MIN_SCORE:
-        print(f"Top result score {results[0][1]:.4f} is below min-score {MIN_SCORE:.4f}.")
-        return
 
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
     prompt = PROMPT_TEMPLATE.format(context=context_text, question=query_text)
